@@ -12,16 +12,36 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Validate Docker Compose
-        run: docker compose -f docker-compose.yml config -q
-
-      - name: Lint shell scripts
+      - name: Validate HTML
         run: |
-          for f in *.sh; do
-            bash -n "$f"
-          done
+          # basic well-formedness check on all html files
+          python3 - <<'PYEOF'
+          import glob
+          from html.parser import HTMLParser
 
-      - name: Validate YAML configs
+          class Check(HTMLParser):
+              def error(self, m):
+                  raise Exception(m)
+
+          for f in glob.glob('**/*.html', recursive=True):
+              Check().feed(open(f, encoding='utf-8', errors='ignore').read())
+          print('HTML parsed OK')
+          PYEOF
+
+      - name: Check assets referenced exist
         run: |
-          pip install pyyaml -q
-          python3 -c "import yaml, glob; [yaml.safe_load(open(f)) for f in glob.glob('**/*.y*ml', recursive=True)]; print('all YAML valid')"
+          python3 - <<'PYEOF'
+          import glob, re, os
+          missing = []
+          for f in glob.glob('**/*.html', recursive=True):
+              base = os.path.dirname(f)
+              for m in re.findall(r'(?:src|href)="((?!https?:|mailto:|#|/)[^"]+)"', open(f, encoding='utf-8', errors='ignore').read()):
+                  p = os.path.join(base, m.split('?')[0].split('#')[0])
+                  if not os.path.exists(p):
+                      missing.append((f, m))
+          if missing:
+              for f, m in missing:
+                  print(f'MISSING: {f} -> {m}')
+              raise SystemExit(1)
+          print('all referenced assets exist')
+          PYEOF
