@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Aries — One workspace for every AI model</title>
+<meta name="description" content="Aries brings Claude, Gemini, GPT, DeepSeek, Kimi and GLM into one fast, private chat workspace. Switch models mid-conversation, use purpose-built agents, and keep your files in context.">
+<meta name="theme-color" content="#d97757">
+<meta property="og:title" content="Aries — One workspace for every AI model">
+<meta property="og:description" content="Claude, Gemini, GPT, DeepSeek, Kimi and GLM behind one clean interface. Pick the right model for each job.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://aries.ai.id">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<style>
+  :root {
+    --terra: #d97757;
+    --terra-dark: #c4654a;
+    --terra-soft: #f6e9e2;
+    --ink: #2a2622;
+    --ink-soft: #6b625a;
+    --paper: #faf9f5;
+    --card: #ffffff;
+    --line: #e8e2da;
+    --radius: 14px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--paper); color: var(--ink); line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  section { padding: 72px 0; }
+  h2.section-title { font-size: clamp(26px, 4vw, 36px); letter-spacing: -0.02em; font-weight: 800; margin-bottom: 12px; }
+  p.section-sub { color: var(--ink-soft); font-size: 16.5px; max-width: 620px; margin-bottom: 40px; }
+  .eyebrow { color: var(--terra); font-weight: 700; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+
+  /* NAV */
+  header { position: sticky; top: 0; background: rgba(250,249,245,.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); z-index: 10; }
+  .nav { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; text-decoration: none; color: var(--ink); }
+  .brand img { width: 32px; height: 32px; border-radius: 8px; }
+  .nav-links { display: flex; gap: 26px; align-items: center; }
+  .nav-links a { color: var(--ink-soft); text-decoration: none; font-size: 15px; font-weight: 500; }
+  .nav-links a:hover { color: var(--terra); }
+  .nav-cta { background: var(--terra); color: #fff !important; padding: 9px 20px; border-radius: 999px; font-weight: 600; }
+  .nav-cta:hover { background: var(--terra-dark); color: #fff !important; }
+  .nav-toggle { display: none; background: none; border: none; font-size: 24px; cursor: pointer; color: var(--ink); }
+
+  /* HERO */
+  .hero { padding: 88px 0 64px; text-align: center; }
+  .hero h1 { font-size: clamp(34px, 6vw, 58px); line-height: 1.1; letter-spacing: -0.025em; font-weight: 800; max-width: 760px; margin: 0 auto 20px; }
+  .hero h1 em { font-style: normal; color: var(--terra); }
+  .hero > .wrap > p { font-size: clamp(16px, 2.4vw, 19px); color: var(--ink-soft); max-width: 600px; margin: 0 auto 32px; }
+  .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary, .btn-ghost { text-decoration: none; font-weight: 600; font-size: 16px; padding: 13px 28px; border-radius: 999px; transition: all .15s; display: inline-block; }
+  .btn-primary { background: var(--terra); color: #fff; }
+  .btn-primary:hover { background: var(--terra-dark); }
+  .btn-ghost { color: var(--ink); border: 1px solid var(--line); background: var(--card); }
+  .btn-ghost:hover { border-color: var(--terra); color: var(--terra); }
+  .models { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 40px; }
+  .chip { font-size: 13.5px; color: var(--ink-soft); background: var(--card); border: 1px solid var(--line); padding: 6px 14px; border-radius: 999px; }
+
+  /* CHAT PREVIEW */
+  .preview { background: var(--card); border: 1px solid var(--line); border-radius: 18px; max-width: 760px; margin: 56px auto 0; box-shadow: 0 24px 60px -30px rgba(42,38,34,.25); overflow: hidden; text-align: left; }
+  .preview-bar { display: flex; gap: 7px; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+  .dot { width: 11px; height: 11px; border-radius: 50%; background: var(--line); }
+  .preview-cap { font-size: 13px; font-weight: 600; color: var(--ink-soft); padding: 12px 18px; border-bottom: 1px solid var(--line); background: var(--paper); }
+  .preview img { display: block; width: 100%; height: auto; }
+  .msg { max-width: 82%; padding: 12px 16px; border-radius: 14px; font-size: 14.5px; }
+  .msg.user { background: var(--terra); color: #fff; margin-left: auto; border-bottom-right-radius: 4px; }
+  .msg.ai { background: var(--paper); border: 1px solid var(--line); border-bottom-left-radius: 4px; }
+  .msg .meta { display: block; font-size: 11.5px; font-weight: 600; color: var(--ink-soft); margin-bottom: 4px; }
+  .msg.user .meta { color: rgba(255,255,255,.75); }
+
+  /* FEATURES */
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px 24px; }
+  .card h3 { font-size: 17px; margin-bottom: 8px; font-weight: 700; }
+  .card p { font-size: 15px; color: var(--ink-soft); }
+  .icon { width: 40px; height: 40px; border-radius: 10px; background: var(--terra-soft); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; font-size: 18px; }
+
+  /* AGENTS */
+  .agents-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+  .agent-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px 18px; text-align: center; }
+  .agent-avatar { width: 48px; height: 48px; border-radius: 12px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #fff; font-weight: 700; }
+  .agent-card h4 { font-size: 15.5px; margin-bottom: 4px; }
+  .agent-card p { font-size: 13px; color: var(--ink-soft); line-height: 1.45; }
+  .agent-card .model-tag { display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 600; color: var(--terra); background: var(--terra-soft); padding: 3px 10px; border-radius: 999px; }
+
+  /* MODELS TABLE */
+  .table-wrap { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  th, td { text-align: left; padding: 14px 20px; border-bottom: 1px solid var(--line); }
+  th { font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); background: var(--paper); font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+  td.m-name { font-weight: 600; }
+  .yes { color: var(--terra); font-weight: 700; }
+  .no { color: var(--line); }
+  .family { font-size: 12px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .05em; }
+
+  /* STEPS */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; counter-reset: step; }
+  .step { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px 24px 24px; }
+  .step-num { width: 32px; height: 32px; border-radius: 50%; background: var(--terra); color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; font-size: 15px; }
+  .step h3 { font-size: 16.5px; margin-bottom: 6px; }
+  .step p { font-size: 14.5px; color: var(--ink-soft); }
+
+  /* FAQ */
+  .faq { max-width: 720px; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 12px; }
+  summary { cursor: pointer; font-weight: 600; font-size: 15.5px; padding: 18px 22px; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; font-size: 20px; color: var(--terra); font-weight: 400; transition: transform .2s; }
+  details[open] summary::after { transform: rotate(45deg); }
+  details p { padding: 0 22px 18px; color: var(--ink-soft); font-size: 14.5px; }
+
+  /* CTA */
+  .cta-band { background: var(--ink); color: #fff; border-radius: 20px; padding: 60px 32px; text-align: center; margin: 24px 0 72px; }
+  .cta-band h2 { font-size: clamp(24px, 4vw, 34px); letter-spacing: -0.01em; margin-bottom: 12px; }
+  .cta-band p { color: #cfc8c0; margin-bottom: 28px; }
+  .cta-band .btn-primary { font-size: 17px; padding: 14px 34px; }
+
+  /* FOOTER */
+  footer { border-top: 1px solid var(--line); padding: 48px 0 40px; color: var(--ink-soft); font-size: 14px; }
+  .foot-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 32px; margin-bottom: 36px; }
+  .foot-brand p { max-width: 280px; margin-top: 10px; font-size: 13.5px; }
+  .foot-col h5 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink); margin-bottom: 12px; }
+  .foot-col a { display: block; color: var(--ink-soft); text-decoration: none; margin-bottom: 8px; font-size: 14px; }
+  .foot-col a:hover { color: var(--terra); }
+  .foot-bottom { border-top: 1px solid var(--line); padding-top: 24px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+
+  @media (max-width: 900px) {
+    .grid-3, .steps { grid-template-columns: 1fr 1fr; }
+    .agents-grid { grid-template-columns: repeat(3, 1fr); }
+    .foot-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 640px) {
+    section { padding: 52px 0; }
+    .nav-links { position: fixed; top: 64px; left: 0; right: 0; background: var(--paper); border-bottom: 1px solid var(--line); flex-direction: column; padding: 18px 24px; gap: 16px; display: none; }
+    .nav-links.open { display: flex; }
+    .nav-toggle { display: block; }
+    .grid-3, .grid-2, .steps { grid-template-columns: 1fr; }
+    .agents-grid { grid-template-columns: 1fr 1fr; }
+    .foot-grid { grid-template-columns: 1fr; gap: 24px; }
+    .hero { padding: 56px 0 48px; }
+    .hero-actions .btn-primary, .hero-actions .btn-ghost { width: 100%; max-width: 320px; text-align: center; }
+    th:nth-child(3), td:nth-child(3), th:nth-child(4), td:nth-child(4) { display: none; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="/"><img src="/assets/logo.svg" alt="Aries logo"> Aries</a>
+    <nav class="nav-links" id="navLinks">
+      <a href="#features">Features</a>
+      <a href="#agents">Agents</a>
+      <a href="#models">Models</a>
+      <a href="#faq">FAQ</a>
+      <a class="nav-cta" href="https://chat.aries.ai.id">Open chat</a>
+    </nav>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">☰</button>
+  </div>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap">
+      <h1>Every model. <em>One workspace.</em> Zero friction.</h1>
+      <p>Aries puts Claude, Gemini, GPT, DeepSeek, Kimi and GLM behind a single clean interface — pick the right model for each job without juggling a dozen tabs and subscriptions.</p>
+      <div class="hero-actions">
+        <a class="btn-primary" href="https://chat.aries.ai.id">Start chatting</a>
+        <a class="btn-ghost" href="#features">See what's inside</a>
+      </div>
+      <div class="models" aria-label="Supported model families">
+        <span class="chip">Claude Sonnet 4.6</span>
+        <span class="chip">Claude Opus 4.6 Thinking</span>
+        <span class="chip">Gemini 3.8 Flash</span>
+        <span class="chip">DeepSeek V4 Pro</span>
+        <span class="chip">Kimi K2.7</span>
+        <span class="chip">GLM 5.2</span>
+        <span class="chip">GPT-OSS 120B</span>
+      </div>
+      <figure class="preview">
+        <figcaption class="preview-cap">A live Aries conversation</figcaption>
+        <img src="/assets/demo-chat.jpg" alt="Screenshot of an Aries chat conversation showing the Aries Polyglot agent answering about mid-conversation model switching" loading="lazy" width="1400" height="875">
+      </figure>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="wrap">
+      <p class="eyebrow">Features</p>
+      <h2 class="section-title">Built for people who ship</h2>
+      <p class="section-sub">Everything you need to work with multiple AI models day-to-day — and nothing you don't.</p>
+      <div class="grid-3">
+        <div class="card">
+          <div class="icon">⇄</div>
+          <h3>Switch models mid-conversation</h3>
+          <p>Start with fast Gemini Flash, escalate a hard problem to Opus 4.6 Thinking, keep the same context. No copy-pasting between apps.</p>
+        </div>
+        <div class="card">
+          <div class="icon">◈</div>
+          <h3>Purpose-built agents</h3>
+          <p>Five pre-tuned agents — Coder, Researcher, Solver, Designer, Polyglot — each paired with the right model and instructions for its job.</p>
+        </div>
+        <div class="card">
+          <div class="icon">⌘</div>
+          <h3>Your files, in context</h3>
+          <p>Drop in PDFs, images and code. Aries reads them alongside your conversation so answers stay grounded in your actual material.</p>
+        </div>
+        <div class="card">
+          <div class="icon">⏱</div>
+          <h3>Conversation memory</h3>
+          <p>Preferences, projects and goals carry across sessions, so you never re-explain your stack, your team, or your style.</p>
+        </div>
+        <div class="card">
+          <div class="icon">⌁</div>
+          <h3>Fast, direct routing</h3>
+          <p>Requests go straight to the model provider — streaming responses the moment a model starts thinking.</p>
+        </div>
+        <div class="card">
+          <div class="icon">⊙</div>
+          <h3>Quiet, keyboard-first UI</h3>
+          <p>No dashboards to learn. Open a tab, type, get work done. The interface stays out of the way on desktop and phone.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AGENTS -->
+  <section id="agents" style="background: #f3f0ea;">
+    <div class="wrap">
+      <p class="eyebrow">Agents</p>
+      <h2 class="section-title">Five specialists, one team</h2>
+      <p class="section-sub">Each agent ships with its own model pairing and system instructions, so the answer you get is tuned for the question you asked.</p>
+      <div class="agents-grid">
+        <div class="agent-card">
+          <div class="agent-avatar" style="background:#d97757;">⌨</div>
+          <h4>Aries Coder</h4>
+          <p>Writes, reviews and refactors production code with security in mind.</p>
+          <span class="model-tag">Claude Sonnet 4.6</span>
+        </div>
+        <div class="agent-card">
+          <div class="agent-avatar" style="background:#7a9e7e;">🔍</div>
+          <h4>Aries Researcher</h4>
+          <p>Searches the web, cross-checks sources, and cites what it finds.</p>
+          <span class="model-tag">Gemini 3.8 Flash</span>
+        </div>
+        <div class="agent-card">
+          <div class="agent-avatar" style="background:#5b7fb5;">◆</div>
+          <h4>Aries Solver</h4>
+          <p>Thinks step by step through hard analytical and math problems.</p>
+          <span class="model-tag">Opus 4.6 Thinking</span>
+        </div>
+        <div class="agent-card">
+          <div class="agent-avatar" style="background:#b58a5b;">✎</div>
+          <h4>Aries Designer</h4>
+          <p>Reviews mockups and screenshots, gives concrete visual feedback.</p>
+          <span class="model-tag">GLM 5v Turbo</span>
+        </div>
+        <div class="agent-card">
+          <div class="agent-avatar" style="background:#8a7ab5;">文</div>
+          <h4>Aries Polyglot</h4>
+          <p>Translation and writing across English, Indonesian, Chinese and more.</p>
+          <span class="model-tag">Kimi K2.7</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODELS -->
+  <section id="models">
+    <div class="wrap">
+      <p class="eyebrow">Models</p>
+      <h2 class="section-title">The full roster</h2>
+      <p class="section-sub">Seventeen models from five families, one API key, zero setup. Capabilities at a glance:</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Model</th><th>Family</th><th>Vision</th><th>Web search</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="m-name">Claude Opus 4.6 Thinking</td><td class="family">Anthropic</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+            <tr><td class="m-name">Claude Sonnet 4.6</td><td class="family">Anthropic</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+            <tr><td class="m-name">Gemini 3.8 Flash (High / Medium / Low)</td><td class="family">Google</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+            <tr><td class="m-name">Kimi K2.7 / K2.5</td><td class="family">Moonshot</td><td class="yes">✓</td><td class="no">—</td></tr>
+            <tr><td class="m-name">GLM 5v Turbo</td><td class="family">Zhipu</td><td class="yes">✓</td><td class="no">—</td></tr>
+            <tr><td class="m-name">DeepSeek V4.1 Flash</td><td class="family">DeepSeek</td><td class="yes">✓</td><td class="no">—</td></tr>
+            <tr><td class="m-name">GLM 5.2 / 5.0 Turbo / 4.7</td><td class="family">Zhipu</td><td class="no">—</td><td class="no">—</td></tr>
+            <tr><td class="m-name">DeepSeek V4 Pro / V3.2 Volc</td><td class="family">DeepSeek</td><td class="no">—</td><td class="no">—</td></tr>
+            <tr><td class="m-name">HY3 Preview</td><td class="family">Zhipu</td><td class="no">—</td><td class="no">—</td></tr>
+            <tr><td class="m-name">GPT-OSS 120B</td><td class="family">OpenAI OSS</td><td class="no">—</td><td class="no">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section style="background: #f3f0ea;">
+    <div class="wrap">
+      <p class="eyebrow">How it works</p>
+      <h2 class="section-title">Three steps, no setup</h2>
+      <p class="section-sub">No API keys to manage, no configuration files, nothing to install.</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <h3>Create your account</h3>
+          <p>Sign up with email at chat.aries.ai.id. Takes less than a minute.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <h3>Pick a model or agent</h3>
+          <p>Choose from 17 models or let a specialist agent handle the task end to end.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <h3>Get to work</h3>
+          <p>Attach files, switch models mid-thread, and pick up exactly where you left off — on any device.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <div class="wrap faq">
+      <p class="eyebrow">FAQ</p>
+      <h2 class="section-title">Common questions</h2>
+      <p class="section-sub" style="margin-bottom: 28px;">Everything people usually ask before their first message.</p>
+      <details open>
+        <summary>Do I need my own API keys?</summary>
+        <p>No. Aries routes every request through its own infrastructure — you just pick a model and chat. There are no keys to manage or bills from separate providers.</p>
+      </details>
+      <details>
+        <summary>Can I switch models in the middle of a conversation?</summary>
+        <p>Yes. The full conversation context carries over when you switch, so you can draft with a fast model and refine with a stronger one without restarting.</p>
+      </details>
+      <details>
+        <summary>What file types can I upload?</summary>
+        <p>Images (PNG, JPEG, WebP), PDFs, and plain text formats including code files and Markdown — up to 50 MB per file.</p>
+      </details>
+      <details>
+        <summary>Does Aries remember anything between sessions?</summary>
+        <p>Yes — preferences, active projects and goals persist across conversations. Memory is structured and editable, so you control what stays.</p>
+      </details>
+      <details>
+        <summary>Is it free?</summary>
+        <p>You can try the chat free. Heavy or specialized usage may require a plan — open the chat for current limits.</p>
+      </details>
+      <details>
+        <summary>Which models have web search?</summary>
+        <p>The Anthropic Claude and Google Gemini families support web search natively through Aries. Other models work with your uploaded files and the conversation context.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="wrap">
+    <section class="cta-band" style="padding: 60px 32px;">
+      <h2>Ready when you are</h2>
+      <p>Open the chat and start with any model — no setup, no keys.</p>
+      <a class="btn-primary" href="https://chat.aries.ai.id">Open chat.aries.ai.id</a>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="/"><img src="/assets/logo.svg" alt="Aries logo"> Aries</a>
+        <p>One workspace for every AI model. Built for people who ship.</p>
+      </div>
+      <div class="foot-col">
+        <h5>Product</h5>
+        <a href="#features">Features</a>
+        <a href="#agents">Agents</a>
+        <a href="#models">Models</a>
+      </div>
+      <div class="foot-col">
+        <h5>Resources</h5>
+        <a href="#faq">FAQ</a>
+        <a href="https://chat.aries.ai.id">Open chat</a>
+      </div>
+      <div class="foot-col">
+        <h5>Connect</h5>
+        <a href="https://chat.aries.ai.id">chat.aries.ai.id</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Aries. All rights reserved.</span>
+      
+    </div>
+  </div>
+</footer>
+
+<script>
+  const t = document.getElementById('navToggle');
+  const l = document.getElementById('navLinks');
+  t.addEventListener('click', () => l.classList.toggle('open'));
+  l.querySelectorAll('a').forEach(a => a.addEventListener('click', () => l.classList.remove('open')));
+</script>
+</body>
+</html>
